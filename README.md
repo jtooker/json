@@ -9,6 +9,9 @@
 [![Github Releases](https://img.shields.io/github/release/nlohmann/json.svg)](https://github.com/nlohmann/json/releases)
 [![Github Issues](https://img.shields.io/github/issues/nlohmann/json.svg)](http://github.com/nlohmann/json/issues)
 
+## jtooker fork ##
+This fork is to **hack** in VS2013 support until our project supports VS2015 later this winter.
+
 ## Design goals
 
 There are myriads of [JSON](http://json.org) libraries out there, and each may even have its reason to exist. Our class had these design goals:
