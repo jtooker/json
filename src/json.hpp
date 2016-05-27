@@ -2645,7 +2645,11 @@ namespace nlohmann
                std::stringstream ss;
                ss << idx;
                // create better exception explanation
+<<<<<<< HEAD
                throw std::out_of_range("array index " + ss.str() + " is out of range");
+=======
+               throw std::out_of_range("array index is out of range");
+>>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
             }
          }
          else
@@ -2691,7 +2695,11 @@ namespace nlohmann
                std::stringstream ss;
                ss << idx;
                // create better exception explanation
+<<<<<<< HEAD
                throw std::out_of_range("array index " + ss.str() + " is out of range");
+=======
+               throw std::out_of_range("array index is out of range");
+>>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
             }
          }
          else
@@ -5617,9 +5625,15 @@ namespace nlohmann
                   // use integer array index as key
                   case value_t::array:
                   {
+<<<<<<< HEAD
                      std::stringstream ss;
                      ss << array_index;
                      return ss.str();
+=======
+                     std::stringstream stream;
+                     stream << array_index;
+                     return stream.str();
+>>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
                   }
 
                   // use key from the object
@@ -7618,8 +7632,14 @@ basic_json_parser_64:
             // conversion
             typename string_t::value_type* endptr;
             assert(m_start != nullptr);
+<<<<<<< HEAD
             const auto float_val = std::strtod(reinterpret_cast<typename string_t::const_pointer>(m_start),
                                                 &endptr);
+=======
+            // should be strtold
+            const auto float_val = std::strtod(reinterpret_cast<typename string_t::const_pointer>(m_start),
+                                               &endptr);
+>>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
 
             // return float_val if the whole number was translated and NAN
             // otherwise
