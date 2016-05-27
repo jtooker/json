@@ -2642,8 +2642,10 @@ namespace nlohmann
             }
             catch (std::out_of_range& e)
             {
+               std::stringstream ss;
+               ss << idx;
                // create better exception explanation
-               throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
+               throw std::out_of_range("array index " + ss.str() + " is out of range");
             }
          }
          else
@@ -2686,8 +2688,10 @@ namespace nlohmann
             }
             catch (std::out_of_range& e)
             {
+               std::stringstream ss;
+               ss << idx;
                // create better exception explanation
-               throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
+               throw std::out_of_range("array index " + ss.str() + " is out of range");
             }
          }
          else
@@ -5613,7 +5617,9 @@ namespace nlohmann
                   // use integer array index as key
                   case value_t::array:
                   {
-                     return std::to_string(array_index);
+                     std::stringstream ss;
+                     ss << array_index;
+                     return ss.str();
                   }
 
                   // use key from the object
@@ -7612,7 +7618,7 @@ basic_json_parser_64:
             // conversion
             typename string_t::value_type* endptr;
             assert(m_start != nullptr);
-            const auto float_val = std::strtold(reinterpret_cast<typename string_t::const_pointer>(m_start),
+            const auto float_val = std::strtod(reinterpret_cast<typename string_t::const_pointer>(m_start),
                                                 &endptr);
 
             // return float_val if the whole number was translated and NAN
