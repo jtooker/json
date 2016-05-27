@@ -94,8 +94,12 @@ namespace nlohmann
       struct has_mapped_type
       {
       private:
-         template<typename C> static char test(typename C::mapped_type*);
-         template<typename C> static char (&test(...))[2];
+         template<typename C>
+         static char test(typename C::mapped_type*);
+
+         template<typename C>
+         static char (& test(...))[2];
+
       public:
          static const bool value = sizeof(test<T>(0)) == 1;
       };
@@ -104,7 +108,7 @@ namespace nlohmann
       template<typename T>
       static bool approx(const T a, const T b)
       {
-         return not(a > b or a < b);
+         return not (a > b or a < b);
       }
    }
 
@@ -176,15 +180,15 @@ namespace nlohmann
 
    @nosubgrouping
    */
-   template <
-      template<typename U, typename V, typename... Args> class ObjectType = std::map,
-      template<typename U, typename... Args> class ArrayType = std::vector,
-      class StringType = std::string,
-      class BooleanType = bool,
-      class NumberIntegerType = int64_t,
-      class NumberFloatType = double,
-      template<typename U> class AllocatorType = std::allocator
-      >
+   template<
+         template<typename U, typename V, typename... Args> class ObjectType = std::map,
+         template<typename U, typename... Args> class ArrayType = std::vector,
+         class StringType = std::string,
+         class BooleanType = bool,
+         class NumberIntegerType = int64_t,
+         class NumberFloatType = double,
+         template<typename U> class AllocatorType = std::allocator
+   >
    class basic_json
    {
    private:
@@ -230,10 +234,12 @@ namespace nlohmann
       using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
 
       // forward declaration
-      template<typename Base> class json_reverse_iterator;
+      template<typename Base>
+      class json_reverse_iterator;
 
       /// an iterator for a basic_json container
       class iterator;
+
       /// a const iterator for a basic_json container
       class const_iterator;
       /// a reverse iterator for a basic_json container
@@ -336,8 +342,8 @@ namespace nlohmann
       */
       using object_t = ObjectType<StringType,
             basic_json,
-            std::less<StringType>,
-            AllocatorType<std::pair<const StringType,
+            std::less < StringType>,
+      AllocatorType<std::pair<const StringType,
             basic_json>>>;
 
       /*!
@@ -609,7 +615,8 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      enum class value_t : uint8_t
+      enum class value_t
+            : uint8_t
       {
          null,           ///< null value
          object,         ///< object (unordered set of name/value pairs)
@@ -621,14 +628,13 @@ namespace nlohmann
          discarded       ///< discarded by the the parser callback function
       };
 
-
    private:
       /// helper for exception-safe object creation
       template<typename T, typename... Args>
       static T* create(Args&& ... args)
       {
-         AllocatorType<T> alloc;
-         auto deleter = [&](T * object)
+         AllocatorType<T>                      alloc;
+         auto                                  deleter = [&](T* object)
          {
             alloc.deallocate(object, 1);
          };
@@ -653,24 +659,34 @@ namespace nlohmann
          /// object (stored with pointer to save storage)
          object_t* object;
          /// array (stored with pointer to save storage)
-         array_t* array;
+         array_t * array;
          /// string (stored with pointer to save storage)
          string_t* string;
          /// boolean
-         boolean_t boolean;
+         boolean_t        boolean;
          /// number (integer)
          number_integer_t number_integer;
          /// number (floating-point)
-         number_float_t number_float;
+         number_float_t   number_float;
 
          /// default constructor (for null values)
-         json_value()  = default;
+         json_value() = default;
+
          /// constructor for booleans
-         json_value(boolean_t v)  : boolean(v) {}
+         json_value(boolean_t v)
+               : boolean(v)
+         { }
+
          /// constructor for numbers (integer)
-         json_value(number_integer_t v)  : number_integer(v) {}
+         json_value(number_integer_t v)
+               : number_integer(v)
+         { }
+
          /// constructor for numbers (floating-point)
-         json_value(number_float_t v)  : number_float(v) {}
+         json_value(number_float_t v)
+               : number_float(v)
+         { }
+
          /// constructor for empty values of a given type
          json_value(value_t t)
          {
@@ -738,7 +754,6 @@ namespace nlohmann
          }
       };
 
-
    public:
       //////////////////////////
       // JSON parser callback //
@@ -752,20 +767,21 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      enum class parse_event_t : uint8_t
+      enum class parse_event_t
+            : uint8_t
       {
          /// the parser read `{` and started to process a JSON object
-         object_start,
+               object_start,
          /// the parser read `}` and finished processing a JSON object
-         object_end,
+               object_end,
          /// the parser read `[` and started to process a JSON array
-         array_start,
+               array_start,
          /// the parser read `]` and finished processing a JSON array
-         array_end,
+               array_end,
          /// the parser read a key of a value in an object
-         key,
+               key,
          /// the parser finished reading a JSON value
-         value
+               value
       };
 
       /*!
@@ -817,7 +833,7 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      using parser_callback_t = std::function<bool(int depth, parse_event_t event, basic_json& parsed)>;
+      using parser_callback_t = std::function <bool(int depth, parse_event_t event, basic_json& parsed)>;
 
 
       //////////////////
@@ -865,8 +881,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const value_t value_type)
-         : m_type(value_type), m_value(value_type)
-      {}
+            : m_type(value_type), m_value(value_type)
+      { }
 
       /*!
       @brief create a null object (implicitly)
@@ -887,7 +903,7 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      basic_json()  = default;
+      basic_json() = default;
 
       /*!
       @brief create a null object (explicitly)
@@ -909,8 +925,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(std::nullptr_t)
-         : basic_json(value_t::null)
-      {}
+            : basic_json(value_t::null)
+      { }
 
       /*!
       @brief create an object (explicit)
@@ -932,8 +948,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const object_t& val)
-         : m_type(value_t::object), m_value(val)
-      {}
+            : m_type(value_t::object), m_value(val)
+      { }
 
       /*!
       @brief create an object (implicit)
@@ -958,13 +974,13 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class CompatibleObjectType, typename
-                std::enable_if<
-                   std::is_constructible<typename object_t::key_type, typename CompatibleObjectType::key_type>::value and
-                   std::is_constructible<basic_json, typename CompatibleObjectType::mapped_type>::value, int>::type
-                = 0>
+      template<class CompatibleObjectType, typename
+      std::enable_if<
+            std::is_constructible<typename object_t::key_type, typename CompatibleObjectType::key_type>::value and
+            std::is_constructible<basic_json, typename CompatibleObjectType::mapped_type>::value, int>::type
+      = 0>
       basic_json(const CompatibleObjectType& val)
-         : m_type(value_t::object)
+            : m_type(value_t::object)
       {
          using std::begin;
          using std::end;
@@ -991,8 +1007,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const array_t& val)
-         : m_type(value_t::array), m_value(val)
-      {}
+            : m_type(value_t::array), m_value(val)
+      { }
 
       /*!
       @brief create an array (implicit)
@@ -1017,18 +1033,18 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class CompatibleArrayType, typename
-                std::enable_if<
-                   not std::is_same<CompatibleArrayType, typename basic_json_t::iterator>::value and
-                   not std::is_same<CompatibleArrayType, typename basic_json_t::const_iterator>::value and
-                   not std::is_same<CompatibleArrayType, typename basic_json_t::reverse_iterator>::value and
-                   not std::is_same<CompatibleArrayType, typename basic_json_t::const_reverse_iterator>::value and
-                   not std::is_same<CompatibleArrayType, typename array_t::iterator>::value and
-                   not std::is_same<CompatibleArrayType, typename array_t::const_iterator>::value and
-                   std::is_constructible<basic_json, typename CompatibleArrayType::value_type>::value, int>::type
-                = 0>
+      template<class CompatibleArrayType, typename
+      std::enable_if<
+            not std::is_same<CompatibleArrayType, typename basic_json_t::iterator>::value and
+            not std::is_same<CompatibleArrayType, typename basic_json_t::const_iterator>::value and
+            not std::is_same<CompatibleArrayType, typename basic_json_t::reverse_iterator>::value and
+            not std::is_same<CompatibleArrayType, typename basic_json_t::const_reverse_iterator>::value and
+            not std::is_same<CompatibleArrayType, typename array_t::iterator>::value and
+            not std::is_same<CompatibleArrayType, typename array_t::const_iterator>::value and
+            std::is_constructible<basic_json, typename CompatibleArrayType::value_type>::value, int>::type
+      = 0>
       basic_json(const CompatibleArrayType& val)
-         : m_type(value_t::array)
+            : m_type(value_t::array)
       {
          using std::begin;
          using std::end;
@@ -1057,8 +1073,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const string_t& val)
-         : m_type(value_t::string), m_value(val)
-      {}
+            : m_type(value_t::string), m_value(val)
+      { }
 
       /*!
       @brief create a string (explicit)
@@ -1081,8 +1097,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const typename string_t::value_type* val)
-         : basic_json(string_t(val))
-      {}
+            : basic_json(string_t(val))
+      { }
 
       /*!
       @brief create a string (implicit)
@@ -1107,13 +1123,13 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class CompatibleStringType, typename
-                std::enable_if<
-                   std::is_constructible<string_t, CompatibleStringType>::value, int>::type
-                = 0>
+      template<class CompatibleStringType, typename
+      std::enable_if<
+            std::is_constructible<string_t, CompatibleStringType>::value, int>::type
+      = 0>
       basic_json(const CompatibleStringType& val)
-         : basic_json(string_t(val))
-      {}
+            : basic_json(string_t(val))
+      { }
 
       /*!
       @brief create a boolean (explicit)
@@ -1130,8 +1146,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(boolean_t val)
-         : m_type(value_t::boolean), m_value(val)
-      {}
+            : m_type(value_t::boolean), m_value(val)
+      { }
 
       /*!
       @brief create an integer number (explicit)
@@ -1159,13 +1175,12 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename T,
-               typename std::enable_if<
-                  not(std::is_same<T, int>::value)
-                  and std::is_same<T, number_integer_t>::value
-                  , int>::type = 0>
+            typename std::enable_if<
+                  not (std::is_same<T, int>::value)
+                  and std::is_same<T, number_integer_t>::value, int>::type = 0>
       basic_json(const number_integer_t val)
-         : m_type(value_t::number_integer), m_value(val)
-      {}
+            : m_type(value_t::number_integer), m_value(val)
+      { }
 
       /*!
       @brief create an integer number from an enum type (explicit)
@@ -1193,9 +1208,9 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const int val)
-         : m_type(value_t::number_integer),
-           m_value(static_cast<number_integer_t>(val))
-      {}
+            : m_type(value_t::number_integer),
+              m_value(static_cast<number_integer_t>(val))
+      { }
 
       /*!
       @brief create an integer number (implicit)
@@ -1223,14 +1238,14 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename CompatibleNumberIntegerType, typename
-               std::enable_if<
-                  std::is_constructible<number_integer_t, CompatibleNumberIntegerType>::value and
-                  std::numeric_limits<CompatibleNumberIntegerType>::is_integer, CompatibleNumberIntegerType>::type
-               = 0>
+      std::enable_if<
+            std::is_constructible<number_integer_t, CompatibleNumberIntegerType>::value and
+            std::numeric_limits<CompatibleNumberIntegerType>::is_integer, CompatibleNumberIntegerType>::type
+      = 0>
       basic_json(const CompatibleNumberIntegerType val)
-         : m_type(value_t::number_integer),
-           m_value(static_cast<number_integer_t>(val))
-      {}
+            : m_type(value_t::number_integer),
+              m_value(static_cast<number_integer_t>(val))
+      { }
 
       /*!
       @brief create a floating-point number (explicit)
@@ -1257,12 +1272,12 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const number_float_t val)
-         : m_type(value_t::number_float), m_value(val)
+            : m_type(value_t::number_float), m_value(val)
       {
          // replace infinity and NAN by null
          if (not std::isfinite(val))
          {
-            m_type = value_t::null;
+            m_type  = value_t::null;
             m_value = json_value();
          }
       }
@@ -1298,13 +1313,13 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename CompatibleNumberFloatType, typename = typename
-               std::enable_if<
-                  std::is_constructible<number_float_t, CompatibleNumberFloatType>::value and
-                  std::is_floating_point<CompatibleNumberFloatType>::value>::type
-               >
+      std::enable_if<
+            std::is_constructible<number_float_t, CompatibleNumberFloatType>::value and
+            std::is_floating_point<CompatibleNumberFloatType>::value>::type
+      >
       basic_json(const CompatibleNumberFloatType val)
-         : basic_json(number_float_t(val))
-      {}
+            : basic_json(number_float_t(val))
+      { }
 
       /*!
       @brief create a container (array or object) from an initializer list
@@ -1375,7 +1390,7 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      basic_json(std::initializer_list<basic_json> init,
+      basic_json(std::initializer_list <basic_json> init,
                  bool type_deduction = true,
                  value_t manual_type = value_t::array)
       {
@@ -1415,7 +1430,7 @@ namespace nlohmann
          if (is_an_object)
          {
             // the initializer list is a list of pairs -> create object
-            m_type = value_t::object;
+            m_type  = value_t::object;
             m_value = value_t::object;
 
             assert(m_value.object != nullptr);
@@ -1467,8 +1482,8 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      static basic_json array(std::initializer_list<basic_json> init =
-                                 std::initializer_list<basic_json>())
+      static basic_json array(std::initializer_list <basic_json> init =
+      std::initializer_list<basic_json>())
       {
          return basic_json(init, false, value_t::array);
       }
@@ -1507,8 +1522,8 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      static basic_json object(std::initializer_list<basic_json> init =
-                                  std::initializer_list<basic_json>())
+      static basic_json object(std::initializer_list <basic_json> init =
+      std::initializer_list<basic_json>())
       {
          return basic_json(init, false, value_t::object);
       }
@@ -1532,7 +1547,7 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(size_type cnt, const basic_json& val)
-         : m_type(value_t::array)
+            : m_type(value_t::array)
       {
          m_value.array = create<array_t>(cnt, val);
       }
@@ -1571,13 +1586,13 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class InputIT, typename
-                std::enable_if<
-                   std::is_same<InputIT, typename basic_json_t::iterator>::value or
-                   std::is_same<InputIT, typename basic_json_t::const_iterator>::value
-                   , int>::type
-                = 0>
-      basic_json(InputIT first, InputIT last) : m_type(first.m_object->m_type)
+      template<class InputIT, typename
+      std::enable_if<
+            std::is_same<InputIT, typename basic_json_t::iterator>::value or
+            std::is_same<InputIT, typename basic_json_t::const_iterator>::value, int>::type
+      = 0>
+      basic_json(InputIT first, InputIT last)
+            : m_type(first.m_object->m_type)
       {
          // make sure iterator fits the current value
          if (first.m_object != last.m_object)
@@ -1651,7 +1666,8 @@ namespace nlohmann
             default:
             {
                assert(first.m_object != nullptr);
-               throw std::domain_error("cannot use construct with iterators from " + first.m_object->type_name());
+               throw std::domain_error(
+                     "cannot use construct with iterators from " + first.m_object->type_name());
             }
          }
       }
@@ -1681,7 +1697,7 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(const basic_json& other)
-         : m_type(other.m_type)
+            : m_type(other.m_type)
       {
          switch (m_type)
          {
@@ -1750,11 +1766,11 @@ namespace nlohmann
       @since version 1.0.0
       */
       basic_json(basic_json&& other)
-         : m_type(std::move(other.m_type)),
-           m_value(std::move(other.m_value))
+            : m_type(std::move(other.m_type)),
+              m_value(std::move(other.m_value))
       {
          // invalidate payload
-         other.m_type = value_t::null;
+         other.m_type  = value_t::null;
          other.m_value = {};
       }
 
@@ -2163,11 +2179,10 @@ namespace nlohmann
       //////////////////
 
       /// get an object (explicit)
-      template <class T, typename
-                std::enable_if<
-                   std::is_convertible<typename object_t::key_type, typename T::key_type>::value and
-                   std::is_convertible<basic_json_t, typename T::mapped_type>::value
-                   , int>::type = 0>
+      template<class T, typename
+      std::enable_if<
+            std::is_convertible<typename object_t::key_type, typename T::key_type>::value and
+            std::is_convertible<basic_json_t, typename T::mapped_type>::value, int>::type = 0>
       T get_impl(T*) const
       {
          if (is_object())
@@ -2196,14 +2211,13 @@ namespace nlohmann
       }
 
       /// get an array (explicit)
-      template <class T, typename
-                std::enable_if<
-                   std::is_convertible<basic_json_t, typename T::value_type>::value and
-                   not std::is_same<basic_json_t, typename T::value_type>::value and
-                   not std::is_arithmetic<T>::value and
-                   not std::is_convertible<std::string, T>::value and
-                   not has_mapped_type<T>::value
-                   , int>::type = 0>
+      template<class T, typename
+      std::enable_if<
+            std::is_convertible<basic_json_t, typename T::value_type>::value and
+            not std::is_same<basic_json_t, typename T::value_type>::value and
+            not std::is_arithmetic<T>::value and
+            not std::is_convertible<std::string, T>::value and
+            not has_mapped_type<T>::value, int>::type = 0>
       T get_impl(T*) const
       {
          if (is_array())
@@ -2212,9 +2226,9 @@ namespace nlohmann
             assert(m_value.array != nullptr);
             std::transform(m_value.array->begin(), m_value.array->end(),
                            std::inserter(to_vector, to_vector.end()), [](basic_json i)
-            {
-               return i.get<typename T::value_type>();
-            });
+                           {
+                              return i.get<typename T::value_type>();
+                           });
             return to_vector;
          }
          else
@@ -2224,23 +2238,22 @@ namespace nlohmann
       }
 
       /// get an array (explicit)
-      template <class T, typename
-                std::enable_if<
-                   std::is_convertible<basic_json_t, T>::value and
-                   not std::is_same<basic_json_t, T>::value
-                   , int>::type = 0>
-      std::vector<T> get_impl(std::vector<T>*) const
+      template<class T, typename
+      std::enable_if<
+            std::is_convertible<basic_json_t, T>::value and
+            not std::is_same<basic_json_t, T>::value, int>::type = 0>
+      std::vector <T> get_impl(std::vector <T>*) const
       {
          if (is_array())
          {
-            std::vector<T> to_vector;
+            std::vector <T> to_vector;
             assert(m_value.array != nullptr);
             to_vector.reserve(m_value.array->size());
             std::transform(m_value.array->begin(), m_value.array->end(),
                            std::inserter(to_vector, to_vector.end()), [](basic_json i)
-            {
-               return i.get<T>();
-            });
+                           {
+                              return i.get<T>();
+                           });
             return to_vector;
          }
          else
@@ -2250,11 +2263,10 @@ namespace nlohmann
       }
 
       /// get an array (explicit)
-      template <class T, typename
-                std::enable_if<
-                   std::is_same<basic_json, typename T::value_type>::value and
-                   not has_mapped_type<T>::value
-                   , int>::type = 0>
+      template<class T, typename
+      std::enable_if<
+            std::is_same<basic_json, typename T::value_type>::value and
+            not has_mapped_type<T>::value, int>::type = 0>
       T get_impl(T*) const
       {
          if (is_array())
@@ -2283,10 +2295,9 @@ namespace nlohmann
       }
 
       /// get a string (explicit)
-      template <typename T, typename
-                std::enable_if<
-                   std::is_convertible<string_t, T>::value
-                   , int>::type = 0>
+      template<typename T, typename
+      std::enable_if<
+            std::is_convertible<string_t, T>::value, int>::type = 0>
       T get_impl(T*) const
       {
          if (is_string())
@@ -2302,9 +2313,8 @@ namespace nlohmann
 
       /// get a number (explicit)
       template<typename T, typename
-               std::enable_if<
-                  std::is_arithmetic<T>::value
-                  , int>::type = 0>
+      std::enable_if<
+            std::is_arithmetic<T>::value, int>::type = 0>
       T get_impl(T*) const
       {
          switch (m_type)
@@ -2450,9 +2460,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename ValueType, typename
-               std::enable_if<
-                  not std::is_pointer<ValueType>::value
-                  , int>::type = 0>
+      std::enable_if<
+            not std::is_pointer<ValueType>::value, int>::type = 0>
       ValueType get() const
       {
          return get_impl(static_cast<ValueType*>(nullptr));
@@ -2485,9 +2494,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename PointerType, typename
-               std::enable_if<
-                  std::is_pointer<PointerType>::value
-                  , int>::type = 0>
+      std::enable_if<
+            std::is_pointer<PointerType>::value, int>::type = 0>
       PointerType get()
       {
          // delegate the call to get_ptr
@@ -2499,9 +2507,8 @@ namespace nlohmann
       @copydoc get()
       */
       template<typename PointerType, typename
-               std::enable_if<
-                  std::is_pointer<PointerType>::value
-                  , int>::type = 0>
+      std::enable_if<
+            std::is_pointer<PointerType>::value, int>::type = 0>
       const PointerType get() const
       {
          // delegate the call to get_ptr
@@ -2534,9 +2541,8 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename PointerType, typename
-               std::enable_if<
-                  std::is_pointer<PointerType>::value
-                  , int>::type = 0>
+      std::enable_if<
+            std::is_pointer<PointerType>::value, int>::type = 0>
       PointerType get_ptr()
       {
          // delegate the call to get_impl_ptr<>()
@@ -2548,10 +2554,9 @@ namespace nlohmann
       @copydoc get_ptr()
       */
       template<typename PointerType, typename
-               std::enable_if<
-                  std::is_pointer<PointerType>::value
-                  and std::is_const<typename std::remove_pointer<PointerType>::type>::value
-                  , int>::type = 0>
+      std::enable_if<
+            std::is_pointer<PointerType>::value
+            and std::is_const<typename std::remove_pointer<PointerType>::type>::value, int>::type = 0>
       const PointerType get_ptr() const
       {
          // delegate the call to get_impl_ptr<>() const
@@ -2587,11 +2592,12 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename ValueType, typename
-               std::enable_if<
-                  not std::is_pointer<ValueType>::value
-                  and not std::is_same<ValueType, typename string_t::value_type>::value
-                  and not std::is_same<ValueType, std::initializer_list<typename string_t::value_type>>::value
-                  , int>::type = 0>
+      std::enable_if<
+            not std::is_pointer<ValueType>::value
+            and not std::is_same<ValueType, typename string_t::value_type>::value
+            and not std::is_same < ValueType, std::initializer_list < typename string_t::value_type>> ::value
+      , int>::type = 0>
+
       operator ValueType() const
       {
          // delegate the call to get<>() const
@@ -2645,11 +2651,7 @@ namespace nlohmann
                std::stringstream ss;
                ss << idx;
                // create better exception explanation
-<<<<<<< HEAD
                throw std::out_of_range("array index " + ss.str() + " is out of range");
-=======
-               throw std::out_of_range("array index is out of range");
->>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
             }
          }
          else
@@ -2695,11 +2697,7 @@ namespace nlohmann
                std::stringstream ss;
                ss << idx;
                // create better exception explanation
-<<<<<<< HEAD
                throw std::out_of_range("array index " + ss.str() + " is out of range");
-=======
-               throw std::out_of_range("array index is out of range");
->>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
             }
          }
          else
@@ -3008,12 +3006,12 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename T, std::size_t n>
-      reference operator[](const T(&key)[n])
+      reference operator[](const T(& key)[n])
       {
          // implicitly convert null to object
          if (is_null())
          {
-            m_type = value_t::object;
+            m_type  = value_t::object;
             m_value = value_t::object;
          }
 
@@ -3059,7 +3057,7 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename T, std::size_t n>
-      const_reference operator[](const T(&key)[n]) const
+      const_reference operator[](const T(& key)[n]) const
       {
          // at only works for objects
          if (is_object())
@@ -3122,10 +3120,9 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class ValueType, typename
-                std::enable_if<
-                   std::is_convertible<basic_json_t, ValueType>::value
-                   , int>::type = 0>
+      template<class ValueType, typename
+      std::enable_if<
+            std::is_convertible<basic_json_t, ValueType>::value, int>::type = 0>
       ValueType value(const typename object_t::key_type& key, ValueType default_value) const
       {
          // at only works for objects
@@ -3272,12 +3269,11 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class InteratorType, typename
-                std::enable_if<
-                   std::is_same<InteratorType, typename basic_json_t::iterator>::value or
-                   std::is_same<InteratorType, typename basic_json_t::const_iterator>::value
-                   , int>::type
-                = 0>
+      template<class InteratorType, typename
+      std::enable_if<
+            std::is_same<InteratorType, typename basic_json_t::iterator>::value or
+            std::is_same<InteratorType, typename basic_json_t::const_iterator>::value, int>::type
+      = 0>
       InteratorType erase(InteratorType pos)
       {
          // make sure iterator fits the current value
@@ -3377,12 +3373,11 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      template <class InteratorType, typename
-                std::enable_if<
-                   std::is_same<InteratorType, typename basic_json_t::iterator>::value or
-                   std::is_same<InteratorType, typename basic_json_t::const_iterator>::value
-                   , int>::type
-                = 0>
+      template<class InteratorType, typename
+      std::enable_if<
+            std::is_same<InteratorType, typename basic_json_t::iterator>::value or
+            std::is_same<InteratorType, typename basic_json_t::const_iterator>::value, int>::type
+      = 0>
       InteratorType erase(InteratorType first, InteratorType last)
       {
          // make sure iterator fits the current value
@@ -3832,7 +3827,8 @@ namespace nlohmann
 
    private:
       // forward declaration
-      template<typename IteratorType> class iteration_proxy;
+      template<typename IteratorType>
+      class iteration_proxy;
 
    public:
       /*!
@@ -4150,7 +4146,7 @@ namespace nlohmann
       void push_back(basic_json&& val)
       {
          // push_back only works for null objects or arrays
-         if (not(is_null() or is_array()))
+         if (not (is_null() or is_array()))
          {
             throw std::domain_error("cannot use push_back() with " + type_name());
          }
@@ -4158,7 +4154,7 @@ namespace nlohmann
          // transform null object into an array
          if (is_null())
          {
-            m_type = value_t::array;
+            m_type  = value_t::array;
             m_value = value_t::array;
          }
 
@@ -4186,7 +4182,7 @@ namespace nlohmann
       void push_back(const basic_json& val)
       {
          // push_back only works for null objects or arrays
-         if (not(is_null() or is_array()))
+         if (not (is_null() or is_array()))
          {
             throw std::domain_error("cannot use push_back() with " + type_name());
          }
@@ -4194,7 +4190,7 @@ namespace nlohmann
          // transform null object into an array
          if (is_null())
          {
-            m_type = value_t::array;
+            m_type  = value_t::array;
             m_value = value_t::array;
          }
 
@@ -4236,7 +4232,7 @@ namespace nlohmann
       void push_back(const typename object_t::value_type& val)
       {
          // push_back only works for null objects or objects
-         if (not(is_null() or is_object()))
+         if (not (is_null() or is_object()))
          {
             throw std::domain_error("cannot use push_back() with " + type_name());
          }
@@ -4244,7 +4240,7 @@ namespace nlohmann
          // transform null object into an object
          if (is_null())
          {
-            m_type = value_t::object;
+            m_type  = value_t::object;
             m_value = value_t::object;
          }
 
@@ -4422,9 +4418,9 @@ namespace nlohmann
          iterator result(this);
          assert(m_value.array != nullptr);
          result.m_it.array_iterator = m_value.array->insert(
-                                         pos.m_it.array_iterator,
-                                         first.m_it.array_iterator,
-                                         last.m_it.array_iterator);
+               pos.m_it.array_iterator,
+               first.m_it.array_iterator,
+               last.m_it.array_iterator);
          return result;
       }
 
@@ -4452,7 +4448,7 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      iterator insert(const_iterator pos, std::initializer_list<basic_json> ilist)
+      iterator insert(const_iterator pos, std::initializer_list <basic_json> ilist)
       {
          // insert only works for arrays
          if (not is_array())
@@ -4620,15 +4616,15 @@ namespace nlohmann
       */
       friend bool operator<(const value_t lhs, const value_t rhs)
       {
-         static std::array<uint8_t, 7> order = {{
-               0, // null
-               3, // object
-               4, // array
-               5, // string
-               1, // boolean
-               2, // integer
-               2  // float
-            }
+         static std::array <uint8_t, 7> order = {{
+                                                       0, // null
+                                                       3, // object
+                                                       4, // array
+                                                       5, // string
+                                                       1, // boolean
+                                                       2, // integer
+                                                       2  // float
+                                                 }
          };
 
          // discarded values are not comparable
@@ -4776,7 +4772,7 @@ namespace nlohmann
       */
       friend bool operator!=(const_reference lhs, const_reference rhs)
       {
-         return not(lhs == rhs);
+         return not (lhs == rhs);
       }
 
       /*!
@@ -4920,7 +4916,7 @@ namespace nlohmann
       */
       friend bool operator<=(const_reference lhs, const_reference rhs)
       {
-         return not(rhs < lhs);
+         return not (rhs < lhs);
       }
 
       /*!
@@ -4942,7 +4938,7 @@ namespace nlohmann
       */
       friend bool operator>(const_reference lhs, const_reference rhs)
       {
-         return not(lhs <= rhs);
+         return not (lhs <= rhs);
       }
 
       /*!
@@ -4964,7 +4960,7 @@ namespace nlohmann
       */
       friend bool operator>=(const_reference lhs, const_reference rhs)
       {
-         return not(lhs < rhs);
+         return not (lhs < rhs);
       }
 
       /// @}
@@ -5003,7 +4999,7 @@ namespace nlohmann
       {
          // read width member and use it as indentation parameter if nonzero
          const bool pretty_print = (o.width() > 0);
-         const auto indentation = (pretty_print ? o.width() : 0);
+         const auto indentation  = (pretty_print ? o.width() : 0);
 
          // reset width to 0 for subsequent calls to this stream
          o.width(0);
@@ -5233,8 +5229,8 @@ namespace nlohmann
          }
 
          // create a result string of necessary size
-         string_t result(s.size() + space, '\\');
-         std::size_t pos = 0;
+         string_t    result(s.size() + space, '\\');
+         std::size_t pos  = 0;
 
          for (const auto& c : s)
          {
@@ -5248,7 +5244,7 @@ namespace nlohmann
                   break;
                }
 
-               // reverse solidus (0x5c)
+                  // reverse solidus (0x5c)
                case '\\':
                {
                   // nothing to change
@@ -5256,7 +5252,7 @@ namespace nlohmann
                   break;
                }
 
-               // backspace (0x08)
+                  // backspace (0x08)
                case '\b':
                {
                   result[pos + 1] = 'b';
@@ -5264,7 +5260,7 @@ namespace nlohmann
                   break;
                }
 
-               // formfeed (0x0c)
+                  // formfeed (0x0c)
                case '\f':
                {
                   result[pos + 1] = 'f';
@@ -5272,7 +5268,7 @@ namespace nlohmann
                   break;
                }
 
-               // newline (0x0a)
+                  // newline (0x0a)
                case '\n':
                {
                   result[pos + 1] = 'n';
@@ -5280,7 +5276,7 @@ namespace nlohmann
                   break;
                }
 
-               // carriage return (0x0d)
+                  // carriage return (0x0d)
                case '\r':
                {
                   result[pos + 1] = 'r';
@@ -5288,7 +5284,7 @@ namespace nlohmann
                   break;
                }
 
-               // horizontal tab (0x09)
+                  // horizontal tab (0x09)
                case '\t':
                {
                   result[pos + 1] = 't';
@@ -5308,8 +5304,8 @@ namespace nlohmann
 
                      // print character c as \uxxxx
                      for (const char m :
-                  { 'u', '0', '0', hexify(c >> 4), hexify(c & 0x0f)
-                     })
+                           {'u', '0', '0', hexify(c >> 4), hexify(c & 0x0f)
+                           })
                      {
                         result[++pos] = m;
                      }
@@ -5382,8 +5378,8 @@ namespace nlohmann
                      o << (pretty_print ? ",\n" : ",");
                   }
                   o << string_t(new_indent, ' ') << "\""
-                    << escape_string(i->first) << "\":"
-                    << (pretty_print ? " " : "");
+                  << escape_string(i->first) << "\":"
+                  << (pretty_print ? " " : "");
                   i->second.dump(o, pretty_print, indent_step, new_indent);
                }
 
@@ -5491,7 +5487,6 @@ namespace nlohmann
       /// the value of the current element
       json_value m_value = {};
 
-
    private:
       ///////////////
       // iterators //
@@ -5534,7 +5529,7 @@ namespace nlohmann
          }
 
          /// return reference to the value to change and compare
-         operator difference_type& ()
+         operator difference_type&()
          {
             return m_it;
          }
@@ -5547,7 +5542,7 @@ namespace nlohmann
 
       private:
          static const difference_type begin_value = 0;
-         static const difference_type end_value = begin_value + 1;
+         static const difference_type end_value   = begin_value + 1;
 
          /// iterator as signed integer type
          difference_type m_it = std::numeric_limits<std::ptrdiff_t>::denorm_min();
@@ -5565,14 +5560,14 @@ namespace nlohmann
          /// iterator for JSON objects
          typename object_t::iterator object_iterator;
          /// iterator for JSON arrays
-         typename array_t::iterator array_iterator;
+         typename array_t::iterator  array_iterator;
          /// generic iterator for all other types
-         primitive_iterator_t primitive_iterator;
+         primitive_iterator_t        primitive_iterator;
 
          /// create an uninitialized internal_iterator
          internal_iterator()
-            : object_iterator(), array_iterator(), primitive_iterator()
-         {}
+               : object_iterator(), array_iterator(), primitive_iterator()
+         { }
       };
 
       /// proxy class for the iterator_wrapper functions
@@ -5587,12 +5582,12 @@ namespace nlohmann
             /// the iterator
             IteratorType anchor;
             /// an index for arrays (used to create key names)
-            size_t array_index = 0;
+            size_t       array_index = 0;
 
          public:
             iteration_proxy_internal(IteratorType it)
-               : anchor(it)
-            {}
+                  : anchor(it)
+            { }
 
             /// dereference operator (needed for range-based for)
             iteration_proxy_internal& operator*()
@@ -5610,7 +5605,7 @@ namespace nlohmann
             }
 
             /// inequality operator (needed for range-based for)
-            bool operator!= (const iteration_proxy_internal& o) const
+            bool operator!=(const iteration_proxy_internal& o) const
             {
                return anchor != o.anchor;
             }
@@ -5625,24 +5620,18 @@ namespace nlohmann
                   // use integer array index as key
                   case value_t::array:
                   {
-<<<<<<< HEAD
                      std::stringstream ss;
                      ss << array_index;
                      return ss.str();
-=======
-                     std::stringstream stream;
-                     stream << array_index;
-                     return stream.str();
->>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
                   }
 
-                  // use key from the object
+                     // use key from the object
                   case value_t::object:
                   {
                      return anchor.key();
                   }
 
-                  // use an empty key for all primitive types
+                     // use an empty key for all primitive types
                   default:
                   {
                      return "";
@@ -5663,8 +5652,8 @@ namespace nlohmann
       public:
          /// construct iteration proxy from a container
          iteration_proxy(typename IteratorType::reference cont)
-            : container(cont)
-         {}
+               : container(cont)
+         { }
 
          /// return iterator begin (needed for range-based for)
          iteration_proxy_internal begin()
@@ -5693,7 +5682,8 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      class const_iterator : public std::iterator<std::random_access_iterator_tag, const basic_json>
+      class const_iterator
+            : public std::iterator<std::random_access_iterator_tag, const basic_json>
       {
          /// allow basic_json to access private members
          friend class basic_json;
@@ -5714,7 +5704,8 @@ namespace nlohmann
          const_iterator() = default;
 
          /// constructor for a given JSON instance
-         const_iterator(pointer object) : m_object(object)
+         const_iterator(pointer object)
+               : m_object(object)
          {
             assert(m_object != nullptr);
 
@@ -5741,7 +5732,8 @@ namespace nlohmann
          }
 
          /// copy constructor given a nonconst iterator
-         const_iterator(const iterator& other) : m_object(other.m_object)
+         const_iterator(const iterator& other)
+               : m_object(other.m_object)
          {
             assert(m_object != nullptr);
 
@@ -5769,8 +5761,8 @@ namespace nlohmann
 
          /// copy constructor
          const_iterator(const const_iterator& other)
-            : m_object(other.m_object), m_it(other.m_it)
-         {}
+               : m_object(other.m_object), m_it(other.m_it)
+         { }
 
          /// copy assignment
          const_iterator& operator=(const_iterator other)
@@ -6065,7 +6057,7 @@ namespace nlohmann
          /// comparison: less than or equal
          bool operator<=(const const_iterator& other) const
          {
-            return not other.operator < (*this);
+            return not other.operator<(*this);
          }
 
          /// comparison: greater than
@@ -6213,9 +6205,9 @@ namespace nlohmann
 
       private:
          /// associated JSON instance
-         pointer m_object = nullptr;
+         pointer           m_object = nullptr;
          /// the actual iterator of the associated instance
-         internal_iterator m_it = internal_iterator();
+         internal_iterator m_it     = internal_iterator();
       };
 
       /*!
@@ -6230,7 +6222,8 @@ namespace nlohmann
 
       @since version 1.0.0
       */
-      class iterator : public const_iterator
+      class iterator
+            : public const_iterator
       {
       public:
          using base_iterator = const_iterator;
@@ -6242,13 +6235,13 @@ namespace nlohmann
 
          /// constructor for a given JSON instance
          iterator(pointer object)
-            : base_iterator(object)
-         {}
+               : base_iterator(object)
+         { }
 
          /// copy constructor
          iterator(const iterator& other)
-            : base_iterator(other)
-         {}
+               : base_iterator(other)
+         { }
 
          /// copy assignment
          iterator& operator=(iterator other)
@@ -6365,23 +6358,24 @@ namespace nlohmann
       @since version 1.0.0
       */
       template<typename Base>
-      class json_reverse_iterator : public std::reverse_iterator<Base>
+      class json_reverse_iterator
+            : public std::reverse_iterator<Base>
       {
       public:
          /// shortcut to the reverse iterator adaptor
-         using base_iterator = std::reverse_iterator<Base>;
+         using base_iterator = std::reverse_iterator <Base>;
          /// the reference type for the pointed-to element
          using reference = typename Base::reference;
 
          /// create reverse iterator from iterator
          json_reverse_iterator(const typename base_iterator::iterator_type& it)
-            : base_iterator(it)
-         {}
+               : base_iterator(it)
+         { }
 
          /// create reverse iterator from base class
          json_reverse_iterator(const base_iterator& it)
-            : base_iterator(it)
-         {}
+               : base_iterator(it)
+         { }
 
          /// post-increment (it++)
          json_reverse_iterator operator++(int)
@@ -6455,10 +6449,9 @@ namespace nlohmann
          reference value() const
          {
             auto it = --this->base();
-            return it.operator * ();
+            return it.operator*();
          }
       };
-
 
    private:
       //////////////////////
@@ -6499,7 +6492,7 @@ namespace nlohmann
 
          /// constructor with a given buffer
          explicit lexer(const string_t& s)
-            : m_stream(nullptr), m_buffer(s)
+               : m_stream(nullptr), m_buffer(s)
          {
             m_content = reinterpret_cast<const lexer_char_t*>(s.c_str());
             assert(m_content != nullptr);
@@ -6509,7 +6502,7 @@ namespace nlohmann
 
          /// constructor with a given stream
          explicit lexer(std::istream* s)
-            : m_stream(s), m_buffer()
+               : m_stream(s), m_buffer()
          {
             assert(m_stream != nullptr);
             getline(*m_stream, m_buffer);
@@ -6524,6 +6517,7 @@ namespace nlohmann
 
          // switch off unwanted functions
          lexer(const lexer&) = delete;
+
          lexer operator=(const lexer&) = delete;
 
          /*!
@@ -6556,14 +6550,14 @@ namespace nlohmann
                if (codepoint2 >= 0xDC00 and codepoint2 <= 0xDFFF)
                {
                   codepoint =
-                     // high surrogate occupies the most significant 22 bits
-                     (codepoint1 << 10)
-                     // low surrogate occupies the least significant 15 bits
-                     + codepoint2
-                     // there is still the 0xD800, 0xDC00 and 0x10000 noise
-                     // in the result so we have to substract with:
-                     // (0xD800 << 10) + DC00 - 0x10000 = 0x35FDC00
-                     - 0x35FDC00;
+                        // high surrogate occupies the most significant 22 bits
+                        (codepoint1 << 10)
+                        // low surrogate occupies the least significant 15 bits
+                        + codepoint2
+                        // there is still the 0xD800, 0xDC00 and 0x10000 noise
+                        // in the result so we have to substract with:
+                        // (0xD800 << 10) + DC00 - 0x10000 = 0x35FDC00
+                        - 0x35FDC00;
                }
                else
                {
@@ -6585,15 +6579,18 @@ namespace nlohmann
             else if (codepoint <= 0xffff)
             {
                // 3-byte characters: 1110xxxx 10xxxxxx 10xxxxxx
-               result.append(1, static_cast<typename string_t::value_type>(0xE0 | ((codepoint >> 12) & 0x0F)));
+               result.append(1,
+                             static_cast<typename string_t::value_type>(0xE0 | ((codepoint >> 12) & 0x0F)));
                result.append(1, static_cast<typename string_t::value_type>(0x80 | ((codepoint >> 6) & 0x3F)));
                result.append(1, static_cast<typename string_t::value_type>(0x80 | (codepoint & 0x3F)));
             }
             else if (codepoint <= 0x10ffff)
             {
                // 4-byte characters: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-               result.append(1, static_cast<typename string_t::value_type>(0xF0 | ((codepoint >> 18) & 0x07)));
-               result.append(1, static_cast<typename string_t::value_type>(0x80 | ((codepoint >> 12) & 0x3F)));
+               result.append(1,
+                             static_cast<typename string_t::value_type>(0xF0 | ((codepoint >> 18) & 0x07)));
+               result.append(1,
+                             static_cast<typename string_t::value_type>(0x80 | ((codepoint >> 12) & 0x3F)));
                result.append(1, static_cast<typename string_t::value_type>(0x80 | ((codepoint >> 6) & 0x3F)));
                result.append(1, static_cast<typename string_t::value_type>(0x80 | (codepoint & 0x3F)));
             }
@@ -6665,45 +6662,44 @@ namespace nlohmann
             m_start = m_cursor;
             assert(m_start != nullptr);
 
-
             {
-               lexer_char_t yych;
-               unsigned int yyaccept = 0;
-               static const unsigned char yybm[] =
-               {
-                  0,   0,   0,   0,   0,   0,   0,   0,
-                  0,  32,  32,   0,   0,  32,   0,   0,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  96,  64,   0,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  192, 192, 192, 192, 192, 192, 192, 192,
-                  192, 192,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,   0,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-                  64,  64,  64,  64,  64,  64,  64,  64,
-               };
+               lexer_char_t               yych;
+               unsigned int               yyaccept = 0;
+               static const unsigned char yybm[]   =
+                                                {
+                                                      0, 0, 0, 0, 0, 0, 0, 0,
+                                                      0, 32, 32, 0, 0, 32, 0, 0,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      96, 64, 0, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      192, 192, 192, 192, 192, 192, 192, 192,
+                                                      192, 192, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 0, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                      64, 64, 64, 64, 64, 64, 64, 64,
+                                                };
                if ((m_limit - m_cursor) < 5)
                {
                   yyfill();    // LCOV_EXCL_LINE;
@@ -6843,93 +6839,93 @@ namespace nlohmann
                      }
                   }
                }
-basic_json_parser_2:
+               basic_json_parser_2:
                ++m_cursor;
                yych = *m_cursor;
                goto basic_json_parser_5;
-basic_json_parser_3:
+               basic_json_parser_3:
                {
                   return scan();
                }
-basic_json_parser_4:
+               basic_json_parser_4:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
                   yyfill();    // LCOV_EXCL_LINE;
                }
                yych = *m_cursor;
-basic_json_parser_5:
+               basic_json_parser_5:
                if (yybm[0 + yych] & 32)
                {
                   goto basic_json_parser_4;
                }
                goto basic_json_parser_3;
-basic_json_parser_6:
+               basic_json_parser_6:
                yyaccept = 0;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych == 0xBB)
                {
                   goto basic_json_parser_64;
                }
-basic_json_parser_7:
+               basic_json_parser_7:
                {
                   return token_type::parse_error;
                }
-basic_json_parser_8:
+               basic_json_parser_8:
                ++m_cursor;
                {
                   return token_type::begin_array;
                }
-basic_json_parser_10:
+               basic_json_parser_10:
                ++m_cursor;
                {
                   return token_type::end_array;
                }
-basic_json_parser_12:
+               basic_json_parser_12:
                ++m_cursor;
                {
                   return token_type::begin_object;
                }
-basic_json_parser_14:
+               basic_json_parser_14:
                ++m_cursor;
                {
                   return token_type::end_object;
                }
-basic_json_parser_16:
+               basic_json_parser_16:
                ++m_cursor;
                {
                   return token_type::value_separator;
                }
-basic_json_parser_18:
+               basic_json_parser_18:
                ++m_cursor;
                {
                   return token_type::name_separator;
                }
-basic_json_parser_20:
+               basic_json_parser_20:
                yyaccept = 0;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych == 'u')
                {
                   goto basic_json_parser_60;
                }
                goto basic_json_parser_7;
-basic_json_parser_21:
+               basic_json_parser_21:
                yyaccept = 0;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych == 'r')
                {
                   goto basic_json_parser_56;
                }
                goto basic_json_parser_7;
-basic_json_parser_22:
+               basic_json_parser_22:
                yyaccept = 0;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych == 'a')
                {
                   goto basic_json_parser_51;
                }
                goto basic_json_parser_7;
-basic_json_parser_23:
+               basic_json_parser_23:
                yych = *++m_cursor;
                if (yych <= '/')
                {
@@ -6944,9 +6940,9 @@ basic_json_parser_23:
                   goto basic_json_parser_41;
                }
                goto basic_json_parser_7;
-basic_json_parser_24:
+               basic_json_parser_24:
                yyaccept = 1;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych <= 'D')
                {
                   if (yych == '.')
@@ -6965,38 +6961,38 @@ basic_json_parser_24:
                      goto basic_json_parser_44;
                   }
                }
-basic_json_parser_25:
+               basic_json_parser_25:
                {
                   return token_type::value_number;
                }
-basic_json_parser_26:
+               basic_json_parser_26:
                yyaccept = 1;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                goto basic_json_parser_42;
-basic_json_parser_27:
+               basic_json_parser_27:
                yyaccept = 0;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych <= 0x0F)
                {
                   goto basic_json_parser_7;
                }
                goto basic_json_parser_32;
-basic_json_parser_28:
+               basic_json_parser_28:
                ++m_cursor;
                {
                   return token_type::end_of_input;
                }
-basic_json_parser_30:
+               basic_json_parser_30:
                yych = *++m_cursor;
                goto basic_json_parser_7;
-basic_json_parser_31:
+               basic_json_parser_31:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
                   yyfill();    // LCOV_EXCL_LINE;
                }
                yych = *m_cursor;
-basic_json_parser_32:
+               basic_json_parser_32:
                if (yybm[0 + yych] & 64)
                {
                   goto basic_json_parser_31;
@@ -7010,7 +7006,7 @@ basic_json_parser_32:
                   goto basic_json_parser_35;
                }
                goto basic_json_parser_34;
-basic_json_parser_33:
+               basic_json_parser_33:
                m_cursor = m_marker;
                if (yyaccept == 0)
                {
@@ -7020,7 +7016,7 @@ basic_json_parser_33:
                {
                   goto basic_json_parser_25;
                }
-basic_json_parser_34:
+               basic_json_parser_34:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7099,12 +7095,12 @@ basic_json_parser_34:
                      }
                   }
                }
-basic_json_parser_35:
+               basic_json_parser_35:
                ++m_cursor;
                {
                   return token_type::value_string;
                }
-basic_json_parser_37:
+               basic_json_parser_37:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7137,7 +7133,7 @@ basic_json_parser_37:
                      goto basic_json_parser_33;
                   }
                }
-basic_json_parser_38:
+               basic_json_parser_38:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7170,7 +7166,7 @@ basic_json_parser_38:
                      goto basic_json_parser_33;
                   }
                }
-basic_json_parser_39:
+               basic_json_parser_39:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7203,7 +7199,7 @@ basic_json_parser_39:
                      goto basic_json_parser_33;
                   }
                }
-basic_json_parser_40:
+               basic_json_parser_40:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7238,7 +7234,7 @@ basic_json_parser_40:
                   }
                   goto basic_json_parser_33;
                }
-basic_json_parser_41:
+               basic_json_parser_41:
                yyaccept = 1;
                m_marker = ++m_cursor;
                if ((m_limit - m_cursor) < 3)
@@ -7246,7 +7242,7 @@ basic_json_parser_41:
                   yyfill();    // LCOV_EXCL_LINE;
                }
                yych = *m_cursor;
-basic_json_parser_42:
+               basic_json_parser_42:
                if (yybm[0 + yych] & 128)
                {
                   goto basic_json_parser_41;
@@ -7270,7 +7266,7 @@ basic_json_parser_42:
                   }
                   goto basic_json_parser_25;
                }
-basic_json_parser_43:
+               basic_json_parser_43:
                yych = *++m_cursor;
                if (yych <= '/')
                {
@@ -7281,7 +7277,7 @@ basic_json_parser_43:
                   goto basic_json_parser_48;
                }
                goto basic_json_parser_33;
-basic_json_parser_44:
+               basic_json_parser_44:
                yych = *++m_cursor;
                if (yych <= ',')
                {
@@ -7306,7 +7302,7 @@ basic_json_parser_44:
                   }
                   goto basic_json_parser_33;
                }
-basic_json_parser_45:
+               basic_json_parser_45:
                yych = *++m_cursor;
                if (yych <= '/')
                {
@@ -7316,7 +7312,7 @@ basic_json_parser_45:
                {
                   goto basic_json_parser_33;
                }
-basic_json_parser_46:
+               basic_json_parser_46:
                ++m_cursor;
                if (m_limit <= m_cursor)
                {
@@ -7332,7 +7328,7 @@ basic_json_parser_46:
                   goto basic_json_parser_46;
                }
                goto basic_json_parser_25;
-basic_json_parser_48:
+               basic_json_parser_48:
                yyaccept = 1;
                m_marker = ++m_cursor;
                if ((m_limit - m_cursor) < 3)
@@ -7364,9 +7360,9 @@ basic_json_parser_48:
                   }
                   goto basic_json_parser_25;
                }
-basic_json_parser_50:
+               basic_json_parser_50:
                yyaccept = 1;
-               yych = *(m_marker = ++m_cursor);
+               yych     = *(m_marker = ++m_cursor);
                if (yych <= 'D')
                {
                   if (yych == '.')
@@ -7387,7 +7383,7 @@ basic_json_parser_50:
                   }
                   goto basic_json_parser_25;
                }
-basic_json_parser_51:
+               basic_json_parser_51:
                yych = *++m_cursor;
                if (yych != 'l')
                {
@@ -7407,7 +7403,7 @@ basic_json_parser_51:
                {
                   return token_type::literal_false;
                }
-basic_json_parser_56:
+               basic_json_parser_56:
                yych = *++m_cursor;
                if (yych != 'u')
                {
@@ -7422,7 +7418,7 @@ basic_json_parser_56:
                {
                   return token_type::literal_true;
                }
-basic_json_parser_60:
+               basic_json_parser_60:
                yych = *++m_cursor;
                if (yych != 'l')
                {
@@ -7437,7 +7433,7 @@ basic_json_parser_60:
                {
                   return token_type::literal_null;
                }
-basic_json_parser_64:
+               basic_json_parser_64:
                yych = *++m_cursor;
                if (yych != 0xBF)
                {
@@ -7449,18 +7445,17 @@ basic_json_parser_64:
                }
             }
 
-
          }
 
          /// append data from the stream to the internal buffer
          void yyfill()
          {
-            if (m_stream == nullptr or not * m_stream)
+            if (m_stream == nullptr or not *m_stream)
             {
                return;
             }
 
-            const ssize_t offset_start = m_start - m_content;
+            const ssize_t offset_start  = m_start - m_content;
             const ssize_t offset_marker = m_marker - m_start;
             const ssize_t offset_cursor = m_cursor - m_start;
 
@@ -7565,25 +7560,30 @@ basic_json_parser_64:
                         break;
                      }
 
-                     // unicode
+                        // unicode
                      case 'u':
                      {
                         // get code xxxx from uxxxx
-                        auto codepoint = std::strtoul(std::string(reinterpret_cast<typename string_t::const_pointer>(i + 1),
-                                                                  4).c_str(), nullptr, 16);
+                        auto
+                              codepoint =
+                              std::strtoul(
+                                    std::string(reinterpret_cast<typename string_t::const_pointer>(i + 1),
+                                                4).c_str(), nullptr, 16);
 
                         // check if codepoint is a high surrogate
                         if (codepoint >= 0xD800 and codepoint <= 0xDBFF)
                         {
                            // make sure there is a subsequent unicode
-                           if ((i + 6 >= m_limit) or * (i + 5) != '\\' or * (i + 6) != 'u')
+                           if ((i + 6 >= m_limit) or *(i + 5) != '\\' or *(i + 6) != 'u')
                            {
                               throw std::invalid_argument("missing low surrogate");
                            }
 
                            // get code yyyy from uxxxx\uyyyy
-                           auto codepoint2 = std::strtoul(std::string(reinterpret_cast<typename string_t::const_pointer>
-                                                                      (i + 7), 4).c_str(), nullptr, 16);
+                           auto
+                                 codepoint2 =
+                                 std::strtoul(std::string(reinterpret_cast<typename string_t::const_pointer>
+                                                          (i + 7), 4).c_str(), nullptr, 16);
                            result += to_unicode(codepoint, codepoint2);
                            // skip the next 10 characters (xxxx\uyyyy)
                            i += 10;
@@ -7632,14 +7632,9 @@ basic_json_parser_64:
             // conversion
             typename string_t::value_type* endptr;
             assert(m_start != nullptr);
-<<<<<<< HEAD
-            const auto float_val = std::strtod(reinterpret_cast<typename string_t::const_pointer>(m_start),
-                                                &endptr);
-=======
             // should be strtold
             const auto float_val = std::strtod(reinterpret_cast<typename string_t::const_pointer>(m_start),
                                                &endptr);
->>>>>>> 8c36b4004a079db0b30080c564adf0693c74678a
 
             // return float_val if the whole number was translated and NAN
             // otherwise
@@ -7654,13 +7649,13 @@ basic_json_parser_64:
          /// the buffer pointer
          const lexer_char_t* m_content = nullptr;
          /// pointer to the beginning of the current symbol
-         const lexer_char_t* m_start = nullptr;
+         const lexer_char_t* m_start   = nullptr;
          /// pointer for backtracking information
-         const lexer_char_t* m_marker = nullptr;
+         const lexer_char_t* m_marker  = nullptr;
          /// pointer to the current symbol
-         const lexer_char_t* m_cursor = nullptr;
+         const lexer_char_t* m_cursor  = nullptr;
          /// pointer to the end of the buffer
-         const lexer_char_t* m_limit = nullptr;
+         const lexer_char_t* m_limit   = nullptr;
       };
 
       /*!
@@ -7673,7 +7668,7 @@ basic_json_parser_64:
       public:
          /// constructor for strings
          parser(const string_t& s, parser_callback_t cb = nullptr)
-            : callback(cb), m_lexer(s)
+               : callback(cb), m_lexer(s)
          {
             // read first token
             get_token();
@@ -7681,7 +7676,7 @@ basic_json_parser_64:
 
          /// a parser reading from an input stream
          parser(std::istream& _is, parser_callback_t cb = nullptr)
-            : callback(cb), m_lexer(&_is)
+               : callback(cb), m_lexer(&_is)
          {
             // read first token
             get_token();
@@ -7709,10 +7704,11 @@ basic_json_parser_64:
             {
                case lexer::token_type::begin_object:
                {
-                  if (keep and (not callback or (keep = callback(depth++, parse_event_t::object_start, result))))
+                  if (keep and
+                      (not callback or (keep = callback(depth++, parse_event_t::object_start, result))))
                   {
                      // explicitly set result to object to cope with {}
-                     result.m_type = value_t::object;
+                     result.m_type  = value_t::object;
                      result.m_value = json_value(value_t::object);
                   }
 
@@ -7787,10 +7783,11 @@ basic_json_parser_64:
 
                case lexer::token_type::begin_array:
                {
-                  if (keep and (not callback or (keep = callback(depth++, parse_event_t::array_start, result))))
+                  if (keep and
+                      (not callback or (keep = callback(depth++, parse_event_t::array_start, result))))
                   {
                      // explicitly set result to object to cope with []
-                     result.m_type = value_t::array;
+                     result.m_type  = value_t::array;
                      result.m_value = json_value(value_t::array);
                   }
 
@@ -7858,7 +7855,7 @@ basic_json_parser_64:
                case lexer::token_type::literal_true:
                {
                   get_token();
-                  result.m_type = value_t::boolean;
+                  result.m_type  = value_t::boolean;
                   result.m_value = true;
                   break;
                }
@@ -7866,7 +7863,7 @@ basic_json_parser_64:
                case lexer::token_type::literal_false:
                {
                   get_token();
-                  result.m_type = value_t::boolean;
+                  result.m_type  = value_t::boolean;
                   result.m_value = false;
                   break;
                }
@@ -7890,13 +7887,13 @@ basic_json_parser_64:
                   if (approx(float_val, static_cast<long double>(int_val)))
                   {
                      // we would not lose precision -> return int
-                     result.m_type = value_t::number_integer;
+                     result.m_type  = value_t::number_integer;
                      result.m_value = int_val;
                   }
                   else
                   {
                      // we would lose precision -> return float
-                     result.m_type = value_t::number_float;
+                     result.m_type  = value_t::number_float;
                      result.m_value = static_cast<number_float_t>(float_val);
                   }
                   break;
@@ -7928,8 +7925,10 @@ basic_json_parser_64:
             if (t != last_token)
             {
                std::string error_msg = "parse error - unexpected ";
-               error_msg += (last_token == lexer::token_type::parse_error ? ("'" +  m_lexer.get_token() + "'") :
-                             lexer::token_type_name(last_token));
+               error_msg
+                     +=
+                     (last_token == lexer::token_type::parse_error ? ("'" + m_lexer.get_token() + "'") :
+                      lexer::token_type_name(last_token));
                error_msg += "; expected " + lexer::token_type_name(t);
                throw std::invalid_argument(error_msg);
             }
@@ -7940,21 +7939,23 @@ basic_json_parser_64:
             if (t == last_token)
             {
                std::string error_msg = "parse error - unexpected ";
-               error_msg += (last_token == lexer::token_type::parse_error ? ("'" +  m_lexer.get_token() + "'") :
-                             lexer::token_type_name(last_token));
+               error_msg
+                     +=
+                     (last_token == lexer::token_type::parse_error ? ("'" + m_lexer.get_token() + "'") :
+                      lexer::token_type_name(last_token));
                throw std::invalid_argument(error_msg);
             }
          }
 
       private:
          /// current level of recursion
-         int depth = 0;
+         int                        depth      = 0;
          /// callback function
-         parser_callback_t callback;
+         parser_callback_t          callback;
          /// the type of the last read token
          typename lexer::token_type last_token = lexer::token_type::uninitialized;
          /// the lexer
-         lexer m_lexer;
+         lexer                      m_lexer;
       };
    };
 
@@ -7987,7 +7988,7 @@ namespace std
 
    @since version 1.0.0
    */
-   template <>
+   template<>
    inline void swap(nlohmann::json& j1,
                     nlohmann::json& j2)
    {
@@ -7995,7 +7996,7 @@ namespace std
    }
 
 /// hash value for JSON objects
-   template <>
+   template<>
    struct hash<nlohmann::json>
    {
       /*!
